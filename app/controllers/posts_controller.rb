@@ -1,6 +1,9 @@
 class PostsController < ApplicationController
   def show
     @post = Post.find(params[:id])
+    # @comment = Comment.new
+    @comment = @post.comments.build
+    @comment.build_user
   end
 
   def index
@@ -9,6 +12,9 @@ class PostsController < ApplicationController
 
   def new
     @post = Post.new
+    3.times do 
+      @post.categories.build
+    end
   end
 
   def create
@@ -19,6 +25,8 @@ class PostsController < ApplicationController
   private
 
   def post_params
-    params.require(:post).permit(:title, :content, category_ids:[], categories_attributes: [:name])
+    permitted_params = params.require(:post).permit(:title, :content, category_ids: [], categories_attributes: [:name])
+    permitted_params[:categories_attributes].reject! { |_i, cat| cat[:name].blank? }
+    permitted_params
   end
 end
